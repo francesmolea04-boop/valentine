@@ -1,0 +1,1103 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>For You Only 💌</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Georgia', 'Times New Roman', serif;
+            user-select: none;
+        }
+
+        body {
+            background: linear-gradient(135deg, #1a0a1a 0%, #2d0f2d 50%, #1a0a1a 100%);
+            color: #fff0f5;
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+            overflow-x: hidden;
+            position: relative;
+        }
+
+        /* Heart background pattern */
+        .heart-bg {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image: url("data:image/svg+xml,%3Csvg width='60' height='60' viewBox='0 0 60 60' xmlns='http://www.w3.org/2000/svg'%3E%3Cpath d='M30 20.4c-5-6.7-13.5-8.4-18.7-3.2-5.2 5.2-3.5 13.7 3.2 18.7L30 55l15.5-19.1c6.7-5 8.4-13.5 3.2-18.7-5.2-5.2-13.7-3.5-18.7 3.2z' fill='%23ff6bb5' fill-opacity='0.03'/%3E%3C/svg%3E");
+            z-index: 0;
+        }
+
+        .screen {
+            display: none;
+            max-width: 720px;
+            width: 100%;
+            padding: 50px 40px;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            background: rgba(40, 10, 30, 0.85);
+            border-radius: 30px;
+            box-shadow: 0 25px 70px rgba(255, 20, 147, 0.25),
+                        inset 0 0 0 1px rgba(255, 182, 193, 0.2);
+            animation: screenFadeIn 1s ease-out forwards;
+            position: relative;
+            z-index: 2;
+            backdrop-filter: blur(15px);
+            border: 2px solid;
+            border-image: linear-gradient(45deg, #ff6bb5, #ff1493, #ff6bb5) 1;
+        }
+
+        .screen.active {
+            display: flex;
+        }
+
+        h1 {
+            font-size: 3.2rem;
+            background: linear-gradient(45deg, #ff6bb5, #ff8e53, #ff6bb5);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 20px;
+            text-shadow: 0 0 30px rgba(255, 107, 181, 0.4);
+            position: relative;
+            padding-bottom: 15px;
+        }
+
+        h1::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 25%;
+            width: 50%;
+            height: 3px;
+            background: linear-gradient(90deg, transparent, #ff6bb5, transparent);
+        }
+
+        h2 {
+            font-size: 1.9rem;
+            color: #ffc0cb;
+            margin-bottom: 30px;
+            font-weight: 300;
+            letter-spacing: 1px;
+        }
+
+        .text-content {
+            font-size: 1.5rem;
+            line-height: 1.8;
+            margin: 30px 0;
+            padding: 0 25px;
+            opacity: 0;
+            transform: translateY(15px);
+            animation: textAppear 1s ease-out 0.4s forwards;
+            color: #ffe4e9;
+        }
+
+        .highlight {
+            color: #ff6bb5;
+            font-weight: 600;
+            text-shadow: 0 0 10px rgba(255, 107, 181, 0.3);
+        }
+
+        .small-photo {
+            width: 45%;
+            height: 100%;
+            background: linear-gradient(135deg, #4a2a4a, #3a1a3a);
+            border-radius: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid rgba(255, 182, 193, 0.3);
+            color: #ff8e9e;
+            font-size: 1rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .small-photo::before {
+            content: '📸';
+            position: absolute;
+            font-size: 3rem;
+            opacity: 0.2;
+        }
+
+        .small-photo img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+            position: relative;
+            z-index: 2;
+            border-radius: 13px;
+        }
+
+        .continue-btn {
+            background: linear-gradient(135deg, #ff2e63, #ff6b8b, #ff2e63);
+            background-size: 200% 100%;
+            border: none;
+            color: white;
+            padding: 18px 50px;
+            font-size: 1.4rem;
+            border-radius: 60px;
+            cursor: pointer;
+            margin-top: 40px;
+            transition: all 0.4s ease;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            box-shadow: 0 10px 30px rgba(255, 46, 99, 0.4),
+                        inset 0 1px 0 rgba(255, 255, 255, 0.3);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .continue-btn:hover {
+            transform: translateY(-5px) scale(1.05);
+            box-shadow: 0 15px 40px rgba(255, 46, 99, 0.6);
+            background-position: 100% 0;
+        }
+
+        .continue-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
+            transition: 0.5s;
+        }
+
+        .continue-btn:hover::before {
+            left: 100%;
+        }
+
+        /* Special screen 5 styling */
+        #screen5 {
+            background: linear-gradient(145deg, rgba(50, 15, 40, 0.9), rgba(30, 8, 25, 0.95));
+            box-shadow: 0 0 50px rgba(255, 107, 179, 0.2);
+        }
+
+        #screen5 .text-content {
+            color: #ffd1e8;
+            font-size: 1.6rem;
+        }
+
+        /* Screen 6 personal paragraph */
+        .personal-paragraph {
+            font-size: 1.3rem;
+            line-height: 2;
+            text-align: center;
+            background: linear-gradient(135deg, rgba(255, 107, 179, 0.1), rgba(255, 182, 193, 0.05));
+            padding: 40px;
+            border-radius: 20px;
+            margin: 40px 0;
+            color: #ffe9ef;
+            box-shadow: inset 0 0 30px rgba(255, 107, 179, 0.1);
+            border: 1px solid rgba(255, 107, 179, 0.2);
+            position: relative;
+        }
+
+        .personal-paragraph::before {
+            content: '❝';
+            position: absolute;
+            top: -20px;
+            left: 30px;
+            font-size: 4rem;
+            color: #ff6bb5;
+            opacity: 0.5;
+        }
+
+        .personal-paragraph::after {
+            content: '❞';
+            position: absolute;
+            bottom: -40px;
+            right: 30px;
+            font-size: 4rem;
+            color: #ff6bb5;
+            opacity: 0.5;
+        }
+
+        /* FINAL SCREEN - Valentine's Day Special */
+        #screen8 {
+            background: linear-gradient(145deg, rgba(255, 20, 100, 0.15), rgba(255, 105, 180, 0.2));
+            backdrop-filter: blur(20px);
+            border: 3px solid;
+            border-image: linear-gradient(45deg, #ff6bb5, #ff1493, #ff69b4, #ff6bb5) 1;
+            box-shadow: 0 30px 80px rgba(255, 20, 147, 0.4),
+                        0 0 0 1px rgba(255, 255, 255, 0.1);
+        }
+
+        #screen8 h1 {
+            font-size: 3.5rem;
+            background: linear-gradient(45deg, #ff6bb5, #ff1493, #ff6bb5);
+            animation: rainbow 3s ease-in-out infinite;
+            background-size: 200% 200%;
+        }
+
+        .final-question {
+            font-size: 2.8rem;
+            line-height: 1.4;
+            margin: 50px 0;
+            color: #ffd1e8;
+            text-shadow: 0 0 30px rgba(255, 107, 179, 0.5);
+            position: relative;
+            padding: 30px;
+            background: linear-gradient(135deg, rgba(255, 107, 179, 0.1), rgba(255, 182, 193, 0.05));
+            border-radius: 20px;
+            border: 2px solid rgba(255, 182, 193, 0.3);
+            animation: pulse 3s infinite;
+        }
+
+        .button-container {
+            display: flex;
+            gap: 30px;
+            margin-top: 30px;
+            position: relative;
+            min-height: 120px;
+            width: 100%;
+            justify-content: center;
+            background: rgba(0, 0, 0, 0.1);
+            border-radius: 20px;
+            padding: 20px;
+            border: 1px solid rgba(255, 182, 193, 0.1);
+        }
+
+        #yesButton {
+            background: linear-gradient(135deg, #00c9a7, #00d4b8, #00c9a7);
+            background-size: 200% 100%;
+            box-shadow: 0 10px 30px rgba(0, 201, 167, 0.5);
+            padding: 20px 60px;
+            font-size: 1.6rem;
+            z-index: 10;
+            position: relative;
+        }
+
+        #yesButton:hover {
+            background-position: 100% 0;
+            box-shadow: 0 15px 40px rgba(0, 201, 167, 0.7);
+        }
+
+        #noButton {
+            background: linear-gradient(135deg, #8b0000, #b22222);
+            background-size: 200% 100%;
+            box-shadow: 0 10px 30px rgba(139, 0, 0, 0.3);
+            position: relative;
+            z-index: 5;
+            transition: all 0.3s ease;
+            padding: 20px 60px;
+            font-size: 1.6rem;
+        }
+
+        #noButton.running {
+            position: absolute;
+            transition: all 0.2s linear !important;
+            animation: runAway 0.3s linear forwards;
+        }
+
+        #noButton.hiding {
+            position: absolute;
+            z-index: 1;
+            opacity: 0.7;
+        }
+
+        .response-message {
+            color: #ffcc00;
+            font-style: italic;
+            margin-top: 30px;
+            font-size: 1.4rem;
+            min-height: 50px;
+            padding: 15px 25px;
+            background: linear-gradient(135deg, rgba(255, 204, 0, 0.1), rgba(255, 204, 0, 0.05));
+            border-radius: 15px;
+            border: 1px solid rgba(255, 204, 0, 0.3);
+            animation: messagePulse 0.6s ease;
+            display: none;
+            max-width: 90%;
+        }
+
+        /* Music player controls */
+        .music-controls {
+            position: fixed;
+            bottom: 20px;
+            right: 20px;
+            z-index: 1000;
+            background: rgba(40, 10, 30, 0.9);
+            border-radius: 50px;
+            padding: 10px;
+            backdrop-filter: blur(10px);
+            border: 2px solid rgba(255, 107, 181, 0.3);
+            display: none;
+            align-items: center;
+            gap: 10px;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.3);
+        }
+
+        .music-controls.active {
+            display: flex;
+        }
+
+        .music-btn {
+            background: transparent;
+            border: none;
+            color: #ff6bb5;
+            font-size: 1.8rem;
+            cursor: pointer;
+            width: 40px;
+            height: 40px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .music-btn:hover {
+            background: rgba(255, 107, 181, 0.2);
+            transform: scale(1.1);
+        }
+
+        .song-title {
+            color: #ffc0cb;
+            font-size: 0.9rem;
+            margin-right: 10px;
+            max-width: 150px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        /* Hearts animation */
+        .hearts-container {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 1;
+        }
+
+        .heart {
+            position: absolute;
+            font-size: 28px;
+            opacity: 0;
+            animation: float 7s linear forwards;
+            text-shadow: 0 0 20px currentColor;
+        }
+
+        /* NEW Hanging Out Slide Styling */
+        #screen4 {
+            background: linear-gradient(145deg, rgba(60, 20, 45, 0.9), rgba(35, 10, 30, 0.95));
+            border: 2px solid rgba(255, 182, 193, 0.3);
+        }
+
+        #screen4 .text-content {
+            color: #ffd1e0;
+            font-size: 1.5rem;
+        }
+
+        .hanging-out-image {
+            width: 100%;
+            height: 250px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 10px;
+            margin: 30px 0;
+        }
+
+        /* Animations */
+        @keyframes screenFadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(40px) scale(0.96);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        @keyframes textAppear {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        @keyframes float {
+            0% {
+                transform: translateY(110vh) rotate(0deg) scale(0.5);
+                opacity: 0;
+            }
+            10% {
+                opacity: 1;
+                transform: translateY(90vh) rotate(180deg) scale(1);
+            }
+            90% {
+                opacity: 1;
+            }
+            100% {
+                transform: translateY(-100px) rotate(720deg) scale(0.5);
+                opacity: 0;
+            }
+        }
+
+        @keyframes messagePulse {
+            0% { transform: scale(0.9); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        @keyframes pulse {
+            0% { box-shadow: 0 0 0 0 rgba(255, 107, 179, 0.4); }
+            70% { box-shadow: 0 0 0 20px rgba(255, 107, 179, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(255, 107, 179, 0); }
+        }
+
+        @keyframes rainbow {
+            0% { background-position: 0% 50%; }
+            50% { background-position: 100% 50%; }
+            100% { background-position: 0% 50%; }
+        }
+
+        /* New running away animations */
+        @keyframes runAway {
+            0% { 
+                transform: translate(0, 0) rotate(0deg);
+                opacity: 1;
+            }
+            50% {
+                opacity: 0.7;
+            }
+            100% { 
+                transform: translate(var(--move-x), var(--move-y)) rotate(var(--rotate));
+                opacity: 1;
+            }
+        }
+
+        /* Typewriter effect */
+        .typewriter {
+            overflow: hidden;
+            border-right: 3px solid #ff6bb5;
+            white-space: pre-line;
+            margin: 0 auto;
+            letter-spacing: 0.05em;
+            animation: blink 0.8s step-end infinite;
+        }
+
+        @keyframes blink {
+            50% { border-color: transparent; }
+        }
+
+        /* Valentine decorative elements */
+        .valentine-decoration {
+            position: absolute;
+            font-size: 2rem;
+            opacity: 0.3;
+            animation: floatDecoration 20s linear infinite;
+            pointer-events: none;
+        }
+
+        @keyframes floatDecoration {
+            0% { transform: translateY(0) rotate(0deg); }
+            100% { transform: translateY(-100vh) rotate(360deg); }
+        }
+
+        /* Mobile responsiveness */
+        @media (max-width: 768px) {
+            .screen {
+                padding: 30px 20px;
+                margin: 10px;
+            }
+            
+            h1 { font-size: 2.5rem; }
+            h2 { font-size: 1.6rem; }
+            
+            .final-question {
+                font-size: 2rem;
+                padding: 20px;
+            }
+            
+            .button-container {
+                flex-direction: column;
+                align-items: center;
+                gap: 20px;
+                min-height: 200px;
+            }
+            
+            #noButton {
+                margin-top: 0;
+            }
+            
+            .continue-btn {
+                padding: 16px 40px;
+                font-size: 1.3rem;
+            }
+            
+            .hanging-out-image {
+                flex-direction: column;
+                height: 400px;
+            }
+            
+            .small-photo {
+                width: 90%;
+                height: 48%;
+            }
+            
+            .music-controls {
+                bottom: 10px;
+                right: 10px;
+                left: 10px;
+                justify-content: center;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- Heart background pattern -->
+    <div class="heart-bg"></div>
+    
+    <!-- Hearts animation container -->
+    <div class="hearts-container" id="heartsContainer"></div>
+    
+    <!-- Valentine decorations -->
+    <div id="valentineDecorations"></div>
+    
+    <!-- Music Player Controls -->
+    <div class="music-controls" id="musicControls">
+        <div class="song-title" id="songTitle">Our Song</div>
+        <button class="music-btn" id="playPauseBtn">▶️</button>
+        <button class="music-btn" id="volumeBtn">🔊</button>
+    </div>
+    
+    <!-- STEP 1: The Hook -->
+    <div class="screen active" id="screen1">
+        <h1>💌 A Secret Message 💌</h1>
+        <h2>For one person only...</h2>
+        <div class="text-content">
+            Before you continue...<br>
+            <span class="highlight">this page only works for one person.</span><br><br>
+            And if you're not her,<br>
+            it won't make any sense.
+        </div>
+        <button class="continue-btn" onclick="startExperience()">I think it's me...</button>
+    </div>
+    
+    <!-- STEP 2: The Coincidence -->
+    <div class="screen" id="screen2">
+        <h1>🏉 The Beginning</h1>
+        <div class="text-content" id="text2">
+            5 May 2025<br>
+            The day I randomly decided to watch a rugby game...
+        </div>
+        <button class="continue-btn" onclick="revealText(2)">...</button>
+    </div>
+    
+    <!-- STEP 3: The Meeting -->
+    <div class="screen" id="screen3">
+        <h1>✨ The Meeting</h1>
+        <div class="text-content" id="text3">
+            A coincidence...<br>.
+        </div>
+        <button class="continue-btn" onclick="revealText(3)">...</button>
+    </div>
+    
+    <!-- NEW STEP 4: Started Hanging Out -->
+    <div class="screen" id="screen4">
+        <h1>☕️ Started Hanging Out</h1>
+        <div class="hanging-out-image">
+            <div class="small-photo">
+                <img src="picture1.jpg" alt="Our coffee date">
+            </div>
+            <div class="small-photo">
+                <img src="picture2.jpg" alt="Our late night drive">
+            </div>
+        </div>
+        <div class="text-content" id="text4">
+            We started hanging out...<br>
+            a lot.
+        </div>
+        <button class="continue-btn" onclick="revealText(4)">...</button>
+    </div>
+    
+    <!-- STEP 5: No Feelings Era -->
+    <div class="screen" id="screen5">
+        <h1>😊 The "Agreement"</h1>
+        <div class="text-content" id="text5">
+            We agreed on something very clear:<br><br>
+            <span class="highlight">"We'll continue hanging out...<br>but no catching feelings."</span>
+        </div>
+        <button class="continue-btn" onclick="revealText(5)">...</button>
+    </div>
+    
+    <!-- STEP 6: The Realization -->
+    <div class="screen" id="screen6">
+        <h1>💖 The Realization</h1>
+        <div class="text-content" id="text6">
+            Somewhere between the late talks,<br>
+            the laughs, and the normal days...
+        </div>
+        <button class="continue-btn" onclick="revealText(6)">...</button>
+    </div>
+    
+    <!-- STEP 7: Personal Paragraph -->
+    <div class="screen" id="screen7">
+        <h1>📝 My Heart's Truth</h1>
+        <div class="personal-paragraph">
+            Before you, days just passed. With you, even ordinary moments feel important. You made me excited about things I never cared about, comfortable in ways I never expected, and happy in a way that feels peaceful, not loud.<br><br>
+            We tried not to catch feelings... but I'm really glad we failed.
+        </div>
+        <button class="continue-btn" onclick="nextScreen(8)">One last thing...</button>
+    </div>
+    
+    <!-- STEP 8: The Proposal - Valentine's Day Special -->
+    <div class="screen" id="screen8">
+        <h1>💝 Will You Be Mine? 💝</h1>
+        <div class="final-question" id="finalQuestion">
+            After all the coincidences,<br>
+            all the almost-misses,<br>
+            and all the beautiful moments...<br><br>
+            <span style="color:#ff6bb5;font-size:3rem;">Chanay Oerson will you be my Valentine?</span>
+        </div>
+        <div class="button-container" id="buttonContainer">
+            <button class="continue-btn" id="yesButton" onclick="sheSaidYes()">Yes, Absolutely! 💗</button>
+            <button class="continue-btn" id="noButton">No 😏</button>
+        </div>
+        <div class="response-message" id="responseMessage"></div>
+    </div>
+
+    <!-- Audio Element for Background Music -->
+    <audio id="backgroundMusic" loop>
+        <source src="mysong.mp3" type="audio/mpeg">
+    </audio>
+
+    <!-- Audio Element for Cheering Sound -->
+    <audio id="cheeringSound">
+        <source src="cheering.mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+        let currentScreen = 1;
+        let hasNoButtonBeenClicked = false;
+        let isPlaying = false;
+        let currentVolume = 0.5;
+        
+        const screenTexts = {
+            2: [
+                "5 May 2025\nThe day I randomly decided to watch a rugby game...",
+                "Which is funny\nbecause I don't even watch rugby.\n\nUCT vs Maties\nMy first time ever going.",
+                "You were going too.\nBut somehow...\nthat's still not where we met."
+            ],
+            3: [
+                "Out of every place in Stellenbosch,\nwe somehow ended up at the same spot — Dorp hehehe.",
+                "I didn't even notice you at first.\n\nBut later that night our friends brought us together,\nand that's when we finally started talking.",
+                "I still remember how pretty you looked\nin that cropped maroon Maties shirt.",
+                "And somehow,\na random conversation about anime\nspiraled into the most chaotic jokes...",
+                "You absolutely clowning my friends\nlike you'd known them for years.",
+                "That's when I realized\nyou were different."
+            ],
+            4: [
+                "We started hanging out...\na lot.",
+                "From binge-watching anime and Netflix together,\nto quiet park walks\nand simply enjoying each other's company...",
+                "Every moment with you\nfelt easy and right.\n\nIt felt... natural."
+            ],
+            5: [
+                'We agreed on something very clear:\n\n"We\'ll continue hanging out...\nbut no catching feelings."',
+                "Worst agreement we ever made.",
+                "Because slowly\ntexting you became routine\n\nThen comfort\n\nThen the best part of my day."
+            ],
+            6: [
+                "Somewhere between the late talks,\nthe laughs, and the normal days...",
+                "You stopped being temporary.",
+                "And I realized...\nI wasn't waiting for your messages anymore.\n\nI was waiting for you."
+            ]
+        };
+
+        let textState = {
+            2: 0,
+            3: 0,
+            4: 0,
+            5: 0,
+            6: 0
+        };
+
+        // Audio elements and controls
+        const backgroundMusic = document.getElementById('backgroundMusic');
+        const cheeringSound = document.getElementById('cheeringSound');
+        const musicControls = document.getElementById('musicControls');
+        const playPauseBtn = document.getElementById('playPauseBtn');
+        const volumeBtn = document.getElementById('volumeBtn');
+        const songTitle = document.getElementById('songTitle');
+        
+        // Set initial volume for both audio elements
+        backgroundMusic.volume = currentVolume;
+        cheeringSound.volume = 0.8; // Slightly higher for cheering effect
+        
+        // Play/Pause button functionality
+        playPauseBtn.addEventListener('click', function() {
+            if (isPlaying) {
+                backgroundMusic.pause();
+                playPauseBtn.textContent = '▶️';
+                isPlaying = false;
+            } else {
+                backgroundMusic.play().catch(e => {
+                    console.log("Autoplay prevented, user interaction required");
+                });
+                playPauseBtn.textContent = '⏸️';
+                isPlaying = true;
+            }
+        });
+        
+        // Volume button functionality
+        volumeBtn.addEventListener('click', function() {
+            if (currentVolume === 0) {
+                currentVolume = 0.5;
+                volumeBtn.textContent = '🔊';
+            } else if (currentVolume === 0.5) {
+                currentVolume = 1;
+                volumeBtn.textContent = '🔊';
+            } else {
+                currentVolume = 0;
+                volumeBtn.textContent = '🔇';
+            }
+            backgroundMusic.volume = currentVolume;
+        });
+
+        function startExperience() {
+            // Show music controls
+            musicControls.classList.add('active');
+            
+            // Start playing music
+            backgroundMusic.play().then(() => {
+                isPlaying = true;
+                playPauseBtn.textContent = '⏸️';
+                songTitle.textContent = "Our Special Song";
+            }).catch(e => {
+                console.log("Autoplay prevented, user will need to click play");
+                songTitle.textContent = "Click play for music";
+            });
+            
+            // Proceed to next screen
+            nextScreen(2);
+        }
+
+        function nextScreen(num) {
+            document.querySelector('.screen.active').classList.remove('active');
+            currentScreen = num;
+            const newScreen = document.getElementById(`screen${num}`);
+            newScreen.classList.add('active');
+            
+            // Special effects for final screen
+            if (num === 8) {
+                createValentineDecorations();
+                createHearts(100);
+                setTimeout(() => {
+                    setupNoButton();
+                }, 500);
+            }
+            
+            // Reset animations
+            const textContent = newScreen.querySelector('.text-content');
+            if (textContent) {
+                textContent.style.animation = 'none';
+                setTimeout(() => {
+                    textContent.style.animation = 'textAppear 1s ease-out 0.4s forwards';
+                }, 10);
+            }
+        }
+
+        function revealText(screenNum) {
+            const textElement = document.getElementById(`text${screenNum}`);
+            const button = textElement.nextElementSibling;
+            
+            if (textState[screenNum] < screenTexts[screenNum].length) {
+                const text = screenTexts[screenNum][textState[screenNum]];
+                textElement.innerHTML = text.replace(/\n/g, '<br>');
+                textElement.classList.add('typewriter');
+                
+                textState[screenNum]++;
+                
+                if (textState[screenNum] === screenTexts[screenNum].length) {
+                    button.textContent = 'Continue...';
+                    button.onclick = () => nextScreen(screenNum + 1);
+                    setTimeout(() => {
+                        textElement.classList.remove('typewriter');
+                        textElement.style.borderRight = 'none';
+                    }, 1000);
+                }
+            }
+        }
+
+        function setupNoButton() {
+            const noButton = document.getElementById('noButton');
+            const yesButton = document.getElementById('yesButton');
+            const container = document.getElementById('buttonContainer');
+            const responseMessage = document.getElementById('responseMessage');
+            
+            // Clear any previous event listeners
+            noButton.replaceWith(noButton.cloneNode(true));
+            const newNoButton = document.getElementById('noButton');
+            
+            // Reset state
+            hasNoButtonBeenClicked = false;
+            responseMessage.style.display = 'none';
+            responseMessage.textContent = '';
+            
+            // Initially position "No" button next to "Yes" button (to the right)
+            newNoButton.style.position = 'relative';
+            newNoButton.style.left = '0';
+            newNoButton.style.top = '0';
+            newNoButton.style.transform = 'none';
+            newNoButton.style.opacity = '1';
+            newNoButton.style.display = 'block';
+            newNoButton.classList.remove('running', 'hiding');
+            
+            // Add event listener for the first click
+            newNoButton.addEventListener('click', handleFirstNoButtonClick);
+            newNoButton.addEventListener('mouseover', handleNoButtonHover);
+        }
+
+        function handleNoButtonHover() {
+            // Just a subtle hover effect, nothing fancy
+            const btn = document.getElementById('noButton');
+            if (!hasNoButtonBeenClicked) {
+                btn.style.transform = 'scale(1.05)';
+                setTimeout(() => {
+                    btn.style.transform = 'scale(1)';
+                }, 200);
+            }
+        }
+
+        function handleFirstNoButtonClick(event) {
+            event.preventDefault();
+            event.stopPropagation();
+            
+            const noButton = document.getElementById('noButton');
+            const yesButton = document.getElementById('yesButton');
+            const container = document.getElementById('buttonContainer');
+            
+            if (hasNoButtonBeenClicked) return;
+            
+            hasNoButtonBeenClicked = true;
+            
+            // Hide behind the "Yes" button
+            noButton.classList.add('running');
+            noButton.classList.add('hiding');
+            
+            // Get the position of the "Yes" button
+            const yesRect = yesButton.getBoundingClientRect();
+            const containerRect = container.getBoundingClientRect();
+            
+            // Calculate position to hide behind the "Yes" button
+            const hideX = yesRect.left - containerRect.left;
+            const hideY = yesRect.top - containerRect.top;
+            
+            // Move behind "Yes" button with animation
+            noButton.style.setProperty('--move-x', `${hideX - noButton.offsetLeft}px`);
+            noButton.style.setProperty('--move-y', `${hideY - noButton.offsetTop}px`);
+            noButton.style.setProperty('--rotate', '0deg');
+            
+            // After animation completes, set up continuous running away
+            setTimeout(() => {
+                noButton.classList.remove('running');
+                noButton.style.left = `${hideX}px`;
+                noButton.style.top = `${hideY}px`;
+                noButton.style.zIndex = '1';
+                noButton.style.opacity = '0.7';
+                
+                // Remove the first click listener and add continuous running away
+                noButton.removeEventListener('click', handleFirstNoButtonClick);
+                noButton.removeEventListener('mouseover', handleNoButtonHover);
+                
+                // Set up continuous running away
+                setupContinuousRunning();
+            }, 300);
+            
+            return false;
+        }
+
+        function setupContinuousRunning() {
+            const noButton = document.getElementById('noButton');
+            const container = document.getElementById('buttonContainer');
+            
+            // Make it run away on hover and also proactively
+            noButton.addEventListener('mouseover', makeButtonRunAway);
+            noButton.addEventListener('click', makeButtonRunAway);
+            noButton.addEventListener('touchstart', makeButtonRunAway);
+            
+            // Also make it run away when cursor gets close (proactive running)
+            container.addEventListener('mousemove', (e) => {
+                const rect = noButton.getBoundingClientRect();
+                const buttonCenterX = rect.left + rect.width / 2;
+                const buttonCenterY = rect.top + rect.height / 2;
+                const distance = Math.sqrt(
+                    Math.pow(e.clientX - buttonCenterX, 2) + 
+                    Math.pow(e.clientY - buttonCenterY, 2)
+                );
+                
+                // If cursor is within 100px of button, make it run away
+                if (distance < 100) {
+                    makeButtonRunAway();
+                }
+            });
+        }
+
+        function makeButtonRunAway(event) {
+            if (event) {
+                event.preventDefault();
+                event.stopPropagation();
+            }
+            
+            const btn = document.getElementById('noButton');
+            const container = document.getElementById('buttonContainer');
+            
+            if (!btn || !container) return;
+            
+            // Calculate container boundaries
+            const containerRect = container.getBoundingClientRect();
+            const btnRect = btn.getBoundingClientRect();
+            
+            // Calculate maximum movement to keep button inside container
+            const maxX = containerRect.width - btnRect.width - 20;
+            const maxY = containerRect.height - btnRect.height - 20;
+            
+            // Generate random position within container
+            let newX, newY;
+            let attempts = 0;
+            const maxAttempts = 10;
+            
+            do {
+                newX = Math.random() * maxX;
+                newY = Math.random() * maxY;
+                attempts++;
+            } while (
+                attempts < maxAttempts && 
+                (Math.abs(newX - btn.offsetLeft) < 30 || Math.abs(newY - btn.offsetTop) < 30)
+            );
+            
+            // Add a little random rotation for fun
+            const rotate = (Math.random() * 40) - 20; // -20 to 20 degrees
+            
+            // Set CSS variables for the animation
+            btn.classList.add('running');
+            btn.style.setProperty('--move-x', `${newX - btn.offsetLeft}px`);
+            btn.style.setProperty('--move-y', `${newY - btn.offsetTop}px`);
+            btn.style.setProperty('--rotate', `${rotate}deg`);
+            
+            // Remove the running class after animation completes
+            setTimeout(() => {
+                btn.classList.remove('running');
+                btn.style.left = `${newX}px`;
+                btn.style.top = `${newY}px`;
+                btn.style.transform = `rotate(${rotate}deg)`;
+            }, 300);
+            
+            return false;
+        }
+
+        function createHearts(count = 30) {
+            const container = document.getElementById('heartsContainer');
+            const heartEmojis = ['💖', '💗', '💓', '💘', '💕', '💞', '💝', '❤️', '🧡', '💛', '💚', '💙', '💜'];
+            
+            for (let i = 0; i < count; i++) {
+                const heart = document.createElement('div');
+                heart.className = 'heart';
+                heart.textContent = heartEmojis[Math.floor(Math.random() * heartEmojis.length)];
+                heart.style.left = Math.random() * 100 + 'vw';
+                heart.style.fontSize = (Math.random() * 25 + 20) + 'px';
+                heart.style.animationDelay = Math.random() * 5 + 's';
+                heart.style.color = `hsl(${Math.random() * 360}, 100%, 70%)`;
+                container.appendChild(heart);
+                
+                setTimeout(() => {
+                    if (heart.parentNode === container) {
+                        container.removeChild(heart);
+                    }
+                }, 7000);
+            }
+        }
+
+        function createValentineDecorations() {
+            const container = document.getElementById('valentineDecorations');
+            const decorations = ['💖', '💘', '💝', '💕', '💞', '💓', '💗', '❤️', '🌸', '🌹', '🎀'];
+            
+            for (let i = 0; i < 15; i++) {
+                const deco = document.createElement('div');
+                deco.className = 'valentine-decoration';
+                deco.textContent = decorations[Math.floor(Math.random() * decorations.length)];
+                deco.style.left = Math.random() * 100 + 'vw';
+                deco.style.animationDelay = Math.random() * 20 + 's';
+                deco.style.fontSize = (Math.random() * 30 + 20) + 'px';
+                deco.style.opacity = 0.1 + Math.random() * 0.2;
+                container.appendChild(deco);
+            }
+        }
+
+        function sheSaidYes() {
+            const finalQuestion = document.getElementById('finalQuestion');
+            const buttonContainer = document.getElementById('buttonContainer');
+            const responseMessage = document.getElementById('responseMessage');
+            const noButton = document.getElementById('noButton');
+            
+            finalQuestion.innerHTML = `
+                <div style="font-size:4rem;margin:20px 0;">🎉💘🥰</div>
+                You just made me the <span style="color:#ff6bb5">happiest person</span> in the world!<br><br>
+                Happy Valentine's Day, my love! 💖
+            `;
+            
+            buttonContainer.innerHTML = `
+                <div style="font-size: 1.5rem; color: #00d4b8; margin-top: 30px;">
+                    No takebacks,no refunds.Forever and always... 💞
+                </div>
+            `;
+            
+            responseMessage.style.display = 'none';
+            
+            if (noButton) {
+                noButton.style.display = 'none';
+            }
+            
+            // Create heart explosion
+            for (let i = 0; i < 200; i++) {
+                setTimeout(() => {
+                    createHearts(5);
+                }, i * 10);
+            }
+            
+            // Change background to celebration mode
+            document.querySelector('#screen8').style.background = 
+                'linear-gradient(145deg, rgba(255, 20, 100, 0.3), rgba(255, 105, 180, 0.4))';
+            
+            // Make sure main music continues playing
+            if (!isPlaying) {
+                backgroundMusic.play();
+                isPlaying = true;
+                playPauseBtn.textContent = '⏸️';
+            }
+            
+            // Play cheering sound on top of the background music
+            cheeringSound.currentTime = 0; // Reset to start
+            cheeringSound.play().then(() => {
+                console.log("Cheering sound playing!");
+            }).catch(e => {
+                console.log("Could not play cheering sound:", e);
+            });
+        }
+
+        // Initialize
+        document.addEventListener('DOMContentLoaded', function() {
+            document.querySelector('.text-content').style.animation = 'textAppear 1s ease-out 0.4s forwards';
+            document.addEventListener('contextmenu', (e) => e.preventDefault());
+        });
+    </script>
+</body>
+</html>
